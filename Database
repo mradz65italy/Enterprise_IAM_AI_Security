@@ -3,7 +3,6 @@ Database connection and session management with retry logic
 """
 
 import asyncio
-import time
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -11,21 +10,23 @@ from sqlalchemy import text
 from config import settings
 import redis.asyncio as aioredis
 from loguru import logger
+from urllib.parse import urlparse
 
-# Database URL with proper async driver
+# --- Fix 1: Use urlparse for async DB URL construction ---
 def get_async_database_url(url: str) -> str:
     """Convert database URL to async format safely"""
-    if url.startswith("postgresql+asyncpg://"):
+    parsed = urlparse(url)
+    if parsed.scheme == "postgresql+asyncpg":
         return url
-    elif url.startswith("postgresql://"):
+    elif parsed.scheme == "postgresql":
         return url.replace("postgresql://", "postgresql+asyncpg://", 1)
+    elif url.startswith("postgresql"):
+        return f"postgresql+asyncpg://{url.split('://', 1)[1]}"
     else:
-        # Default to asyncpg if no driver specified
-        return f"postgresql+asyncpg://{url}" if not url.startswith("postgresql") else url
+        raise ValueError("Invalid or unsupported database URL scheme")
 
 DATABASE_URL = get_async_database_url(settings.DATABASE_URL)
 
-# Create async engine with connection pooling
 engine = create_async_engine(
     DATABASE_URL,
     echo=settings.DEBUG,
@@ -41,19 +42,21 @@ engine = create_async_engine(
     }
 )
 
-# Create async session maker
 AsyncSessionLocal = sessionmaker(
     bind=engine,
     class_=AsyncSession,
     expire_on_commit=False
 )
 
-# Create Redis connection with retry
+# --- Fix 2: Use async lock for Redis client initialization ---
+_redis_lock = asyncio.Lock()
+_redis_client = None
+
 async def create_redis_client():
     """Create Redis client with connection retry"""
     max_retries = 5
     retry_delay = 2
-    
+
     for attempt in range(max_retries):
         try:
             client = aioredis.from_url(
@@ -65,7 +68,6 @@ async def create_redis_client():
                 socket_timeout=5,
                 socket_connect_timeout=5
             )
-            # Test connection
             await client.ping()
             logger.info("Redis connection established")
             return client
@@ -77,21 +79,16 @@ async def create_redis_client():
                 logger.error("Failed to connect to Redis after all retries")
                 raise
 
-# Initialize Redis client
-redis_client = None
-
-# Create base class for models
 Base = declarative_base()
 
 async def get_db() -> AsyncSession:
     """Dependency to get database session with retry logic"""
     max_retries = 3
     retry_delay = 1
-    
+
     for attempt in range(max_retries):
         try:
             async with AsyncSessionLocal() as session:
-                # Test connection
                 await session.execute(text("SELECT 1"))
                 yield session
                 return
@@ -104,27 +101,32 @@ async def get_db() -> AsyncSession:
                 raise
 
 async def get_redis():
-    """Dependency to get Redis client"""
-    global redis_client
-    if redis_client is None:
-        redis_client = await create_redis_client()
-    return redis_client
+    """Dependency to get Redis client (thread-safe, prevents race)"""
+    global _redis_client
+    if _redis_client is not None:
+        return _redis_client
+    async with _redis_lock:
+        if _redis_client is None:
+            _redis_client = await create_redis_client()
+    return _redis_client
 
 async def close_db_connections():
     """Close all database connections"""
-    global redis_client
+    global _redis_client
     try:
         await engine.dispose()
-        if redis_client:
-            await redis_client.close()
+        if _redis_client:
+            await _redis_client.close()
+            await _redis_client.connection_pool.disconnect()
+            _redis_client = None
     except Exception as e:
         logger.error(f"Error closing connections: {e}")
 
-# Health check functions with timeout
+# --- Fix 3: Proper use of asyncio.wait_for in health checks ---
 async def check_db_health() -> bool:
     """Check database connectivity with timeout"""
     try:
-        async with asyncio.wait_for(AsyncSessionLocal(), timeout=5) as session:
+        async with AsyncSessionLocal() as session:
             await asyncio.wait_for(session.execute(text("SELECT 1")), timeout=5)
             return True
     except Exception as e:
@@ -141,12 +143,11 @@ async def check_redis_health() -> bool:
         logger.error(f"Redis health check failed: {e}")
         return False
 
-# Database initialization with retry
 async def init_database():
     """Initialize database with retry logic"""
     max_retries = 10
     retry_delay = 5
-    
+
     for attempt in range(max_retries):
         try:
             logger.info(f"Database initialization attempt {attempt + 1}")
