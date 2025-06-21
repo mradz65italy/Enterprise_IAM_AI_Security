@@ -39,15 +39,6 @@ As artificial intelligence becomes integral to enterprise operations, **AI model
 - **Automated incident response** with customizable security playbooks
 - **Threat intelligence integration** from 50+ global security feeds
 
-🎯 Access Points
-
-| **Interface** | **URL** | **Purpose** | **Users** |
-|---------------|---------|-------------|-----------|
-| 🖥️ **Admin Dashboard** | http://localhost:8080 | Identity & access management | IT Administrators |
-| 📚 **API Documentation** | http://localhost:8000/api/docs | Interactive API testing | Developers & DevOps |
-| 🔍 **Health Monitoring** | http://localhost:8000/health | System status & metrics | Operations Teams |
-| 📊 **Audit Portal** | http://localhost:8080/audit | Compliance reporting | Security & Compliance |
-
 📁 Project Examples
 
 ![01_login_screen](https://github.com/user-attachments/assets/293ddc3d-996b-48dd-bd7c-181fe0a07825)
