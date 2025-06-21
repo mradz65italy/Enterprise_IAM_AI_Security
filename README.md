@@ -5,7 +5,7 @@ The Enterprise AI Identity and Access Management (IAM) System is designed to pro
 
 As artificial intelligence becomes integral to enterprise operations, **AI models are the new attack surface**. Traditional IAM systems weren't designed for the unique challenges of AI identity management:
 
-- **🎯 AI Models as First-Class Citizens**: Each AI model needs its own identity, permissions, and audit trail
+- **🎯 AI Models identities such as employees**: Each AI model needs its own identity, permissions, and audit trail
 - **⚡ High-Velocity Access**: AI systems make thousands of API calls per minute requiring sub-100ms authentication
 - **🌐 Distributed Intelligence**: AI models span multiple environments, clouds, and edge devices
 - **🔄 Dynamic Permissions**: AI workloads require adaptive access controls based on context and risk
@@ -16,8 +16,8 @@ As artificial intelligence becomes integral to enterprise operations, **AI model
 | **Confidentiality** | **Integrity** | **Availability** |
 |---------------------|---------------|------------------|
 | 🛡️ Zero-trust AI model authentication | ✅ Tamper-proof audit trails | ⚡ Sub-100ms authentication response |
-| 🔐 End-to-end encryption for AI communications | 🔍 Real-time anomaly detection | 🌐 99.9% uptime with multi-region failover |
-| 🎭 Role-based access with principle of least privilege | 📊 Immutable compliance logging | 🔄 Auto-scaling authentication infrastructure |
+| 🔍 Real-time anomaly detection || 🎭 Role-based access with principle of least privilege 
+| 📊 Immutable compliance logging || 🔄 Auto-scaling authentication infrastructure 
 
 🎯 Core Capabilities
 
