@@ -16,7 +16,6 @@ SET timezone = 'UTC';
 -- This will be handled by the application startup process
 
 -- Create indexes for better performance (these will be created by SQLAlchemy)
--- But we can add some additional ones here
 
 -- Function to update the updated_at column
 CREATE OR REPLACE FUNCTION update_updated_at_column()
