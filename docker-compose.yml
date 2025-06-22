@@ -1,0 +1,121 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: iam_postgres
+    environment:
+      POSTGRES_DB: iam_ai_security
+      POSTGRES_USER: iam_user
+      POSTGRES_PASSWORD: secure_password_123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - iam_network
+    restart: unless-stopped
+
+  # Redis for caching and sessions
+  redis:
+    image: redis:7-alpine
+    container_name: iam_redis
+    command: redis-server --requirepass redis_password_123
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - iam_network
+    restart: unless-stopped
+
+  # FastAPI Backend
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: iam_backend
+    environment:
+      - DATABASE_URL=postgresql://iam_user:secure_password_123@postgres:5432/iam_ai_security
+      - REDIS_URL=redis://:redis_password_123@redis:6379/0
+      - SECRET_KEY=your-super-secret-jwt-key-here-change-in-production
+      - ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+      - ENVIRONMENT=development
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./backend:/app
+      - ./logs:/app/logs
+    networks:
+      - iam_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # React Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: iam_frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - iam_network
+    restart: unless-stopped
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: iam_nginx
+    ports:
+      - "8080:80"
+      - "8443:443"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./docker/nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - iam_network
+    restart: unless-stopped
+
+  # AI Model Simulator (for testing)
+  ai_model_simulator:
+    build:
+      context: ./ai_simulator
+      dockerfile: Dockerfile
+    container_name: ai_model_simulator
+    environment:
+      - IAM_API_URL=http://backend:8000/api/v1
+      - MODEL_ID=test-llm-001
+      - MODEL_NAME=Test Language Model
+      - MODEL_TYPE=language_model
+    depends_on:
+      - backend
+    networks:
+      - iam_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  iam_network:
+    driver: bridge
