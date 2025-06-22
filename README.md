@@ -54,3 +54,47 @@ As artificial intelligence becomes integral to enterprise operations, **AI model
 - Found an error within the code? I am in the learning process and any help or insight is helpful.
 
 THIS IS A WORK IN PROGRESS.....
+
+# Documentation
+Debian
+<div class="code-block">
+  <pre><code class="language-javascript">
+  #Update System 
+    sudo apt update && sudo apt upgrade -y
+  </code></pre>
+  <button class="copy-button">Copy</button>
+</div>
+
+<div class="code-block">
+  <pre><code class="language-javascript">
+  # Install Docker
+    sudo apt install -y docker.io docker-compose-v2 git
+  </code></pre>
+  <button class="copy-button">Copy</button>
+</div>
+
+<div class="code-block">
+  <pre><code class="language-javascript">
+  # Start Docker
+    sudo systemctl start docker
+    sudo systemctl enable docker
+  </code></pre>
+  <button class="copy-button">Copy</button>
+</div>
+
+<div class="code-block">
+  <pre><code class="language-javascript">
+  # Add user to docker group
+    sudo usermod -aG docker $USER
+    newgrp docker
+  </code></pre>
+  <button class="copy-button">Copy</button>
+</div>
+
+<div class="code-block">
+  <pre><code class="language-javascript">
+  # Install additional tools
+    sudo apt install -y nginx certbot python3-certbot-nginx
+  </code></pre>
+  <button class="copy-button">Copy</button>
+</div>
