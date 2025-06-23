@@ -1,5 +1,5 @@
 # Enterprise_IAM_AI_Security
-The Enterprise AI Identity and Access Management (IAM) System is designed to provide comprehensive security controls for AI models operating within corporate networks.
+The Enterprise AI Identity and Access Management (IAM) System is designed to provide security controls for AI models operating within corporate networks.
 
 
 ![enterprise_iam_ai_security_no_github](https://github.com/user-attachments/assets/22706dec-31a5-4d03-8e47-22a50775cf0f)
