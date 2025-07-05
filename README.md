@@ -99,7 +99,7 @@ Debian
   <button class="copy-button">Copy</button>
 </div>
 
-#Directory Structure
+# Directory Structure
 <div class="code-block">
   <pre><code class="language-javascript">
   # enterprise_iam_ai_security_v2/
@@ -115,7 +115,7 @@ Debian
   </code></pre>
 </div>
 
-#Quick Setup
+# Quick Setup
 
 <div class="code-block">
   <pre><code class="language-javascript">
