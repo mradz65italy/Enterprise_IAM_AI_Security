@@ -103,7 +103,7 @@ Debian
 <div class="code-block">
   <pre><code class="language-javascript">
   # enterprise_iam_ai_security_v2/
-    enterprise_iam_ai_security_v2/
+    
 ├── backend/              # FastAPI backend application
 ├── frontend/             # React frontend application
 ├── database/             # Database scripts and migrations
@@ -114,17 +114,6 @@ Debian
 └── docker-compose.yml    # Docker Compose configuration
   </code></pre>
 </div>
-
-#Directory Structure
-enterprise_iam_ai_security_v2/
-├── backend/              # FastAPI backend application
-├── frontend/             # React frontend application
-├── database/             # Database scripts and migrations
-├── docker/               # Docker configurations
-├── docs/                 # Documentation
-├── scripts/              # Utility scripts
-├── tests/                # Test suites
-└── docker-compose.yml    # Docker Compose configuration
 
 #Quick Setup
 
