@@ -98,3 +98,48 @@ Debian
   </code></pre>
   <button class="copy-button">Copy</button>
 </div>
+
+#Directory Structure
+enterprise_iam_ai_security_v2/
+├── backend/              # FastAPI backend application
+├── frontend/             # React frontend application
+├── database/             # Database scripts and migrations
+├── docker/               # Docker configurations
+├── docs/                 # Documentation
+├── scripts/              # Utility scripts
+├── tests/                # Test suites
+└── docker-compose.yml    # Docker Compose configuration
+
+#Quick Setup
+
+<div class="code-block">
+  <pre><code class="language-javascript">
+  # Clone the repository
+    git clone git@github.com:Enterprise_IAM_AI_Security
+  </code></pre>
+  <button class="copy-button">Copy</button>
+</div>
+
+<div class="code-block">
+  <pre><code class="language-javascript">
+  # Configure environment
+    cp .env.example .env
+  </code></pre>
+  <button class="copy-button">Copy</button>
+</div>
+
+<div class="code-block">
+  <pre><code class="language-javascript">
+  # Launch enterprise stack
+    docker-compose up -d
+  </code></pre>
+  <button class="copy-button">Copy</button>
+</div>
+
+<div class="code-block">
+  <pre><code class="language-javascript">
+  # Verify system health
+    curl http://localhost:8000/health
+  </code></pre>
+  <button class="copy-button">Copy</button>
+</div>
